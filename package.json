@@ -1,0 +1,24 @@
+{
+  "name": "blogging-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiannaliu01/dai-blog.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jiannaliu01/dai-blog/issues"
+  },
+  "homepage": "https://github.com/jiannaliu01/dai-blog#readme",
+  "dependencies": {
+    "express-fileupload": "^1.2.1",
+    "express.js": "^1.0.0",
+    "nodemon": "^2.0.15"
+  }
+}

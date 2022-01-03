@@ -8,6 +8,8 @@ let bannerPath;
 
 const publishBtn = document.querySelector('.publish-btn');
 const uploadInput = document.querySelector('#image-upload');
+const uploadMultInput = document.querySelector('#mult-image-upload');
+const videoInput = document.querySelector('#video-upload');
 
 bannerImage.addEventListener('change', () => {
     uploadImage(bannerImage, "banner");
@@ -17,20 +19,40 @@ uploadInput.addEventListener('change', () => {
     uploadImage(uploadInput, "image");
 })
 
+uploadMultInput.addEventListener('change', () => {
+    uploadImage(uploadMultInput, "images");
+})
+
+videoInput.addEventListener('change', () => {
+    uploadImage(videoInput, "video");
+})
+
 const uploadImage = (uploadFile, uploadType) => {
     const [file] = uploadFile.files;
-    if(file && file.type.includes("image")){
+    if(file && (file.type.includes("image") || file.type.includes("video"))){
         const formdata = new FormData();
-        formdata.append('image', file);
+        if (uploadType == "images") {
+            let length = uploadFile.files.length;
 
+            for (let x = 0; x < length; x++) {
+                formdata.append("image", uploadFile.files[x]);
+            }
+        } else {
+            formdata.append('image', file);
+        }
         fetch('/upload', {
             method: 'post',
             body: formdata
         }).then(res => res.json())
         .then(data => {
+            console.log(data, 'data')
             if(uploadType == "image"){
                 addImage(data, file.name);
-            } else{
+            } else if(uploadType == "images") {
+                addImages(data.data);
+            } else if(uploadType == "video") {
+                addVideo(data, file.name);
+            }else{
                 bannerPath = `${location.origin}/${data}`;
                 banner.style.backgroundImage = `url("${bannerPath}")`;
             }
@@ -43,6 +65,22 @@ const uploadImage = (uploadFile, uploadType) => {
 const addImage = (imagepath, alt) => {
     let curPos = articleField.selectionStart;
     let textToInsert = `\r![${alt}](${imagepath})\r`;
+    articleField.value = articleField.value.slice(0, curPos) + textToInsert + articleField.value.slice(curPos);
+}
+
+const addImages = (imagepaths) => {
+    let curPos = articleField.selectionStart;
+    let textToInsert = "\r!";
+    imagepaths.forEach((imagepath) => {
+        textToInsert += `![${imagepath.name}](${imagepath.name})`;
+    });
+    textToInsert += `\r`;
+    articleField.value = articleField.value.slice(0, curPos) + textToInsert + articleField.value.slice(curPos);
+}
+
+const addVideo = (videopath, alt) => {
+    let curPos = articleField.selectionStart;
+    let textToInsert = `\r!(${alt})(${videopath})\r`;
     articleField.value = articleField.value.slice(0, curPos) + textToInsert + articleField.value.slice(curPos);
 }
 

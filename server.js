@@ -23,18 +23,46 @@ app.post('/upload', (req, res) => {
     let file = req.files.image;
     let date = new Date(); 
     // image name 
-    let imagename = date.getDate() + date.getTime() + file.name; 
-    // image upload path 
-    let path = 'src/uploads/' + imagename; 
-
-    // create upload 
-    file.mv(path, (err, result) => {
-        if(err) {
-            throw err;
-        } else {
-            res.json(`uploads/${imagename}`)
+    if (file.length) {
+        try {
+            let data = []; 
+    
+            //loop all images
+            file.forEach((image) => {
+                // move image to uploads directory
+                let imagename = date.getDate() + date.getTime() + image.name; 
+                // image upload path 
+                let path = 'src/uploads/' + imagename; 
+                image.mv(path);
+                // push image details
+                data.push({
+                    name: "uploads/" + imagename,
+                });
+            });
+    
+            //return response
+            res.send({
+                status: true,
+                message: 'Images uploaded!',
+                data: data
+            });
+        } catch (err) {
+            res.status(500).send(err);
         }
-    })
+    } else {
+        let imagename = date.getDate() + date.getTime() + file.name; 
+        // image upload path 
+        let path = 'src/uploads/' + imagename; 
+
+        // create upload 
+        file.mv(path, (err, result) => {
+            if(err) {
+                throw err;
+            } else {
+                res.json(`uploads/${imagename}`)
+            }
+        })
+    }   
 })
 
 app.get("/:blog", (req, res) => {
